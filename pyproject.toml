@@ -1,5 +1,5 @@
 [project]
-name = "python_combiner"
+name = "python-combiner"
 version = "0.1.0"
 authors = [
   { name = "zabackary", email = "137591653+zabackary@users.noreply.github.com" },
@@ -17,8 +17,8 @@ license = { text = "MIT" }
 python-combiner = "python_combiner.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/zabackary/python-compiler"
-Issues = "https://github.com/zabackary/python-compiler/issues"
+Homepage = "https://github.com/zabackary/python-combiner"
+Issues = "https://github.com/zabackary/python-combiner/issues"
 
 [build-system]
 requires = ["setuptools>=61.0"]
