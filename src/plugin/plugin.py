@@ -21,7 +21,7 @@ class Plugin:
         """
         return module
 
-    def hook_module_post_transform(self, path: str, module: list[ast.AST], name_generator: "ModuleUniqueIdentifierGenerator") -> list[ast.AST]:
+    def hook_module_post_transform(self, path: str, module: list[ast.stmt], name_generator: "ModuleUniqueIdentifierGenerator") -> list[ast.stmt]:
         """ A hook run after name translation is performed but before modules are bundled
 
         Generally you should not be using this, but it might be useful to perform 

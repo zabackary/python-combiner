@@ -46,7 +46,7 @@ class Compiler:
             except graph.TopologicalSortError as err:
                 raise CircularDependencyError(err.remaining_modules)
 
-            output: list[ast.AST] = []
+            output: list[ast.stmt] = []
 
             # add helpers needed by the module factories for each mode
             if self.options.export_dictionary_mode == "munch":

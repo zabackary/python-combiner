@@ -26,7 +26,8 @@ class ModuleUniqueIdentifierGenerator:
         if self.minified:
             self.unique_module_name = self.id
         else:
-            self.unique_module_name = f"{purify_identifier(module_name)}_{self.id}"
+            self.unique_module_name = f"{purify_identifier(module_name)}_{
+                self.id}"
 
     def get_factory(self):
         if self.minified:
@@ -170,8 +171,9 @@ class ProcessedModule:
                     args=[],
                     defaults=[],
                     kwonlyargs=[],
-                    kwargs=[],
+                    kwarg=None,
                     kw_defaults=[],
+                    vararg=None
                 ),
                 body=[
                     ast.Import(
@@ -192,7 +194,8 @@ class ProcessedModule:
                         )
                     )
                 ],
-                decorator_list=[]
+                decorator_list=[],
+                type_params=[]
             )
         else:
             # we have the code, so let's transform it
@@ -211,7 +214,7 @@ class ProcessedModule:
                 self.options
             ).visit(self.module)
 
-            body: list[ast.AST] = []
+            body: list[ast.stmt] = []
             body.extend(transformed_module.body)
             if self.name != "__main__":
                 if self.options.export_dictionary_mode == "class":
@@ -320,15 +323,16 @@ class ProcessedModule:
                     args=[ast.arg(arg=item)
                           for item in argument_import_names],
                     defaults=[],
-                    kwargs=[],
+                    kwarg=None,
                     kw_defaults=[],
                     kwonlyargs=[]
                 ),
                 body=body,
-                decorator_list=[]
+                decorator_list=[],
+                type_params=[]
             )
 
-    def generate_evaluated_factory_ast(self, argument_imports: list[str]) -> ast.AST:
+    def generate_evaluated_factory_ast(self, argument_imports: list[str]) -> ast.stmt:
         if self.name == "__main__":
             return ast.Expr(value=ast.Call(
                 func=ast.Name(
