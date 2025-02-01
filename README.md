@@ -1,15 +1,15 @@
-# `python-compiler`
+# `python-combiner`
 
 > A command-line tool to compile Python files into one ginormous one, with
 > plugin support and more.
 
 ## Command-line usage
 
-Must be invoked via `python -m python-compiler` from the parent directory due to
+Must be invoked via `python -m python-combiner` from the parent directory due to
 how Python's module resolver works. If you know a better way, please tell me!
 
 ```text
-usage: python-compiler [-h] -i INPUT [-o [OUTPUT]] [--ignore-imports IGNORE_IMPORTS [IGNORE_IMPORTS ...]] [--remove-imports REMOVE_IMPORTS [REMOVE_IMPORTS ...]] [-p PRELUDE]
+usage: python-combiner [-h] -i INPUT [-o [OUTPUT]] [--ignore-imports IGNORE_IMPORTS [IGNORE_IMPORTS ...]] [--remove-imports REMOVE_IMPORTS [REMOVE_IMPORTS ...]] [-p PRELUDE]
                        [-c DEFINE_CONSTANT DEFINE_CONSTANT] [-d DEFINE] [-m | --minify | --no-minify] [-j | --json | --no-json] [-t | --time | --no-time]
                        [--docstring | --no-docstring] [--module-hash-length MODULE_HASH_LENGTH] [--export-dictionary-mode {dict,munch,class,class_instance}]
                        [--export-names-mode {locals,static}]
