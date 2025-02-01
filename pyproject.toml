@@ -1,6 +1,6 @@
 [project]
 name = "python-combiner"
-version = "0.1.0"
+version = "0.2.0"
 authors = [
   { name = "zabackary", email = "137591653+zabackary@users.noreply.github.com" },
 ]
