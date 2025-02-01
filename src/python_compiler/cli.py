@@ -4,7 +4,7 @@ import os
 import sys
 import time
 
-from .src import Compiler, CompilerOptions, errors, plugin
+from python_compiler import Compiler, CompilerOptions, errors, plugin
 
 DEFAULT_FILE_NAME = "__stdin__.py"
 PROG_NAME = "python-compiler"
@@ -25,7 +25,9 @@ def format_compiler_error(error: errors.CompilerError, output_json: bool = False
     return format_error(error.errcode, str(error), output_json)
 
 
-def main(argv: list[str]):
+def main(argv: list[str] | None = None):
+    if argv is None:
+        argv = sys.argv[1:]
     parser = argparse.ArgumentParser(
         prog=PROG_NAME,
         description="Compiles/merges Python files.")
@@ -138,7 +140,3 @@ def main(argv: list[str]):
                 format_error("assignment-to-constant", str(err), args.json),
                 file=sys.stderr)
             sys.exit(1)
-
-
-if __name__ == "__main__":
-    main(sys.argv[1:])
