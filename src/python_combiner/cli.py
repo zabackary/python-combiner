@@ -4,7 +4,7 @@ import os
 import sys
 import time
 
-from python_compiler import Compiler, CompilerOptions, errors, plugin
+from python_combiner import Compiler, CompilerOptions, errors, plugin
 
 DEFAULT_FILE_NAME = "__stdin__.py"
 PROG_NAME = "python-compiler"
