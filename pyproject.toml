@@ -1,6 +1,6 @@
 [project]
 name = "python-combiner"
-version = "0.2.0"
+version = "0.3.0"
 authors = [
   { name = "zabackary", email = "137591653+zabackary@users.noreply.github.com" },
 ]
@@ -12,6 +12,9 @@ classifiers = [
   "Operating System :: OS Independent",
 ]
 license = { text = "MIT" }
+
+[project.optional-dependencies]
+minifier = ["python-minifier"]
 
 [project.scripts]
 python-combiner = "python_combiner.cli:main"

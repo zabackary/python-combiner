@@ -5,8 +5,7 @@
 
 ## Command-line usage
 
-Must be invoked via `python -m python-combiner` from the parent directory due to
-how Python's module resolver works. If you know a better way, please tell me!
+I think you can install it with `pip` since it's on PyPi, but no promises.
 
 ```text
 usage: python-combiner [-h] -i INPUT [-o [OUTPUT]] [--ignore-imports IGNORE_IMPORTS [IGNORE_IMPORTS ...]] [--remove-imports REMOVE_IMPORTS [REMOVE_IMPORTS ...]] [-p PRELUDE]
@@ -51,9 +50,6 @@ options:
 
 ## Library usage
 
-I'm not sure how pip packages are supposed to be structured, so I'm probably not
-going to publish this library. If you find it useful, I may look into it.
-
 ```python
 import python_compiler
 
@@ -70,10 +66,10 @@ python_compiler.Compiler(
 )
 ```
 
-For more examples, see the [CLI source code](./__main__.py) for example usage.
-Note that `path` does not need to be a real path, but it's used for import
-resolution. The library is mostly documented using docstrings, so just read the
-source code for more help.
+For more examples, see the [CLI source code](./src/python_combiner/cli.py) for
+example usage. Note that `path` does not need to be a real path, but it's used
+for import resolution. The library is mostly documented using docstrings, so
+just read the source code for more help.
 
 ## Plugins
 
