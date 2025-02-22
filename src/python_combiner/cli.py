@@ -7,7 +7,7 @@ import time
 from python_combiner import Compiler, CompilerOptions, errors, plugin
 
 DEFAULT_FILE_NAME = "__stdin__.py"
-PROG_NAME = "python-compiler"
+PROG_NAME = "python-combiner"
 
 
 def format_error(name: str, msg: str, output_json: bool = False):
@@ -97,6 +97,17 @@ def main(argv: list[str] | None = None):
         constants[constant_name] = 1
     current_time = (" at %s" % time.strftime(
         "%a, %d %b %Y %H:%M:%S", time.localtime())) if args.time else ""
+    if args.json:
+        errors.set_json_output(True)
+    if args.minify:
+        try:
+            import python_minifier  # type: ignore
+        except ImportError:
+            print(
+                format_error(
+                    "missing-dependency", "python-minifier is required for minification", args.json),
+                file=sys.stderr)
+            sys.exit(1)
     with args.input as input:
         try:
             plugins: list[plugin.Plugin] = []
@@ -104,8 +115,8 @@ def main(argv: list[str] | None = None):
             plugins.append(plugin.SimplifyIfPlugin())
             if args.prelude is not None:
                 plugins.append(plugin.PreludePlugin(prelude=args.prelude))
-            # if args.minify:
-            #    plugins.append(plugin.MinifyPlugin())
+            if args.minify:
+                plugins.append(plugin.MinifyPlugin())
             merged = Compiler(
                 source=input.read(),
                 path=os.path.join(os.getcwd(),

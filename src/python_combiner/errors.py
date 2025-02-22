@@ -2,28 +2,38 @@ import sys
 
 
 class _terminal_colors:
-    ISATTY = sys.stdout.isatty()
+    isatty = sys.stdout.isatty()
 
-    if ISATTY:
-        HEADER = '\033[95m'
-        OKBLUE = '\033[94m'
-        OKCYAN = '\033[96m'
-        OKGREEN = '\033[92m'
-        WARNING = '\033[93m'
-        FAIL = '\033[91m'
-        ENDC = '\033[0m'
-        BOLD = '\033[1m'
-        UNDERLINE = '\033[4m'
-    else:
-        HEADER = ''
-        OKBLUE = ''
-        OKCYAN = ''
-        OKGREEN = ''
-        WARNING = ''
-        FAIL = ''
-        ENDC = ''
-        BOLD = ''
-        UNDERLINE = ''
+    @classmethod
+    def set_isatty(cls, value: bool) -> None:
+        cls.isatty = value
+        if value:
+            cls.HEADER = '\033[95m'
+            cls.OKBLUE = '\033[94m'
+            cls.OKCYAN = '\033[96m'
+            cls.OKGREEN = '\033[92m'
+            cls.WARNING = '\033[93m'
+            cls.FAIL = '\033[91m'
+            cls.ENDC = '\033[0m'
+            cls.BOLD = '\033[1m'
+            cls.UNDERLINE = '\033[4m'
+        else:
+            cls.HEADER = ''
+            cls.OKBLUE = ''
+            cls.OKCYAN = ''
+            cls.OKGREEN = ''
+            cls.WARNING = ''
+            cls.FAIL = ''
+            cls.ENDC = ''
+            cls.BOLD = ''
+            cls.UNDERLINE = ''
+
+
+_terminal_colors.set_isatty(_terminal_colors.isatty)
+
+
+def set_json_output(value: bool) -> None:
+    _terminal_colors.set_isatty(_terminal_colors.isatty and not value)
 
 
 class CompilerError(Exception):
@@ -72,6 +82,20 @@ class GlobalError(TransformError):
         return f"unsupported: global statements aren't supported by python-compiler\n  {_terminal_colors.OKGREEN}{_terminal_colors.BOLD}help:{_terminal_colors.ENDC} mutating global variables are bad practice and disallowed in some thread-safe languages. try refactoring your code to pass the variable as an argument instead.\n  at {self.path} {self.lineno}:{self.colno}"
 
 
+class RelativeImportError(TransformError):
+    path: str
+    module_name: str
+
+    errcode = "unexpected-relative-import"
+
+    def __init__(self, path: str, module_name: str) -> None:
+        self.path = path
+        self.module_name = module_name
+
+    def __str__(self) -> str:
+        return f"unsupported: relative imports aren't supported by python-compiler\n  {_terminal_colors.OKBLUE}{_terminal_colors.BOLD}note:{_terminal_colors.ENDC} due to complexities in how the Python module resolution system behaves for relative imports, this is unlikely to ever be supported. use traditional absolute imports instead\n  when importing {self.module_name} in {self.path}"
+
+
 class ReservedIdentifierError(TransformError):
     ident: str
     path: str
@@ -118,7 +142,7 @@ class CircularDependencyError(CompilerError):
         self.modules = modules
 
     def __str__(self) -> str:
-        return f"circular dependencies detected\n  {_terminal_colors.OKBLUE}{_terminal_colors.BOLD}note:{_terminal_colors.ENDC} normally this would fail at runtime\n  {_terminal_colors.OKBLUE}{_terminal_colors.BOLD}note:{_terminal_colors.ENDC} modules which may be involved: {_terminal_colors.OKCYAN}{f'{_terminal_colors.ENDC}, {_terminal_colors.OKCYAN}'.join(self.modules)}{_terminal_colors.ENDC}"
+        return f"circular dependencies detected\n  {_terminal_colors.OKBLUE}{_terminal_colors.BOLD}note:{_terminal_colors.ENDC} normally this would fail at runtime\n  {_terminal_colors.OKBLUE}{_terminal_colors.BOLD}note:{_terminal_colors.ENDC} list of modules which may be involved:\n    {_terminal_colors.OKCYAN}{f'{_terminal_colors.ENDC}\n    {_terminal_colors.OKCYAN}'.join(self.modules)}{_terminal_colors.ENDC}"
 
 
 class InternalCompilerError(CompilerError):
@@ -130,7 +154,7 @@ class InternalCompilerError(CompilerError):
         self.message = message
 
     def __str__(self) -> str:
-        return f"{_terminal_colors.BOLD}internal compiler error:{_terminal_colors.ENDC} {self.message if self.message is not None else 'something went wrong'}\n  note: this is a bug. if you wouldn't mind, please report it at {_terminal_colors.UNDERLINE}https://github.com/zabackary/python-compiler/issues{_terminal_colors.ENDC}\n  {_terminal_colors.OKBLUE}{_terminal_colors.BOLD}note:{_terminal_colors.ENDC} this is a logical precondition invalidation, not a crash"
+        return f"{_terminal_colors.BOLD}internal compiler error:{_terminal_colors.ENDC} {self.message if self.message is not None else 'something went wrong'}\n  {_terminal_colors.OKBLUE}{_terminal_colors.BOLD}note:{_terminal_colors.ENDC} this is a bug. if you wouldn't mind, please report it at {_terminal_colors.UNDERLINE}https://github.com/zabackary/python-compiler/issues{_terminal_colors.ENDC}\n  {_terminal_colors.OKBLUE}{_terminal_colors.BOLD}note:{_terminal_colors.ENDC} this is a logical precondition invalidation, not a crash"
 
 
 class NestedModuleRecursionError(CompilerError):

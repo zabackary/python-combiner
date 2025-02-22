@@ -1,12 +1,13 @@
 import ast
 import hashlib
+import os
 import re
 from _ast import Global
 from dataclasses import dataclass
 from typing import Any
 
 from .errors import (AsteriskImportError, GlobalError, InternalCompilerError,
-                     ReservedIdentifierError)
+                     RelativeImportError, ReservedIdentifierError)
 from .options import CompilerOptions
 
 python_invalid_character_re = re.compile(r"[^A-Za-z0-9_]")
@@ -14,9 +15,6 @@ python_invalid_character_re = re.compile(r"[^A-Za-z0-9_]")
 
 def purify_identifier(name: str):
     return python_invalid_character_re.sub("", name)
-
-
-_ident_index = -1
 
 
 @dataclass
@@ -28,13 +26,14 @@ class FoundImport:
     is_asterisk_import: bool
     is_module_import: bool
 
+    _ident_index: int = -1
+
     def generate_unique_identifier(self, minified: bool, hash_length: int):
         if minified:
             # we use global state here because local parameters don't get
             # optimized by python-minifier, so we have to "minify" it ourselves
-            global _ident_index
-            _ident_index += 1
-            return f"__{_ident_index}"
+            FoundImport._ident_index += 1
+            return f"__{FoundImport._ident_index}"
         else:
             id = hashlib.md5(f"{self.module}{self.module_alias}{self.context_path}".encode(
             ), usedforsecurity=False).hexdigest()[:hash_length]
@@ -62,11 +61,14 @@ class ImportVisitor(ast.NodeVisitor):
                     context_path=self.context_path))
 
     def visit_ImportFrom(self, node: ast.ImportFrom) -> Any:
-        if node.module is None:
-            raise InternalCompilerError("ImportFrom module is None")
+        if node.level > 0 or node.module is None:
+            raise RelativeImportError(
+                module_name=node.module if node.module is not None else "unknown",
+                path=self.context_path
+            )
         self.imports.append(
             FoundImport(
-                module=node.module,
+                module=f"{'.' * node.level}{node.module if node.module is not None else ''}",
                 module_alias=None,
                 imports=node.names,
                 is_asterisk_import=False,
@@ -134,6 +136,7 @@ class ModuleTransformer(ast.NodeTransformer):
             # don't emit anything
             return None
         if module is None:
+            # TODO: resolve relative imports
             raise InternalCompilerError(
                 f"ImportFrom module is None")
         resolved_argument = self._resolve_module_argument_identifier(
